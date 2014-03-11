@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from glob import glob
+import argparse
 import json
 import os
 import re
@@ -55,23 +56,29 @@ def get_current_version():
     real_path = os.path.join(os.path.dirname(php_path), os.readlink(php_path))
     return get_version_from_path(os.path.dirname(real_path))
 
+def display_versions(paths):
+    """Output available and current version(s)."""
+    current_version = get_current_version()
+    for version in sorted(paths.iterkeys()):
+        print '*' if current_version == version else ' ', version
+
+parser = argparse.ArgumentParser(description='Switch between installed Homebrew versions of PHP.')
+parser.add_argument('-q', '--quiet', action='store_true', help='Don\'t output selected version information.')
+parser.add_argument('version', nargs='?', default=None, help='Version (sub)string e.g. \'5.4.26\' or \'5.5\'.')
+args = parser.parse_args()
+
 paths = get_homebrew_paths()
 
-if len(sys.argv) == 2:
+if args.version:
     # Reverse sort so that '5.5' will match newest-installed version of 5.5.
     success = False
-    version_prefix = sys.argv[1]
     for version in sorted(paths.iterkeys(), reverse=True):
-        if version[0:len(version_prefix)] == version_prefix:
+        if version[0:len(args.version)] == args.version:
             select_version_path(paths[version])
             success = True
             break
     if not success:
         sys.exit(1)
 
-# Output available and current version(s).
-current_version = get_current_version()
-for version in sorted(paths.iterkeys()):
-    print '*' if current_version == version else ' ', version
-
-sys.exit(0)
+if not args.quiet:
+    display_versions(paths)
