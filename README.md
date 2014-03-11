@@ -47,7 +47,7 @@ $ phpicker 5.6
 * 5.6.0-alpha.3
 ```
 
-### Selecting a version without showing (useful in .bashrc, .zshrc, etc).
+### Selecting a version silently (useful in .bashrc, .zshrc, etc).
 
 ```bash
 $ phpicker -q 5.4
