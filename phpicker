@@ -1,9 +1,26 @@
 #!/usr/bin/python
 
 from glob import glob
+import json
 import os
 import re
+import subprocess
 import sys
+
+config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
+
+if not os.path.isfile(config_path):
+    print 'Please create \'%s\'.' % config_path
+    sys.exit(1)
+
+config = json.load(open(config_path, 'r'))
+if not config.get('bin-dir'):
+    print 'Your bin-dir configuration is missing.'
+    sys.exit(1)
+
+if not os.path.isdir(config.get('bin-dir')):
+    print 'Your bin-dir does not exist.'
+    sys.exit(1)
 
 def get_homebrew_paths():
     """Get the installed Homebrew PHP paths as a dict, keyed on version."""
@@ -21,20 +38,29 @@ def get_version_from_path(path):
     return path[24:][0:-4]
 
 def select_version_path(path):
+    bin_dir = config.get('bin-dir')
     files = get_files_for_path(path)
-    for file_name in files:
-        print 'alias %s=%s/%s' % (file_name, path, file_name)
+    for file_path in files:
+        subprocess.call(['ln', '-s', '-f', file_path, bin_dir])
 
 def get_files_for_path(path):
     """Get the files we should symlink from a given path."""
     ignore_files = ['phar.phar']
-    return [x for x in os.listdir(path) if x not in ignore_files]
+    return [os.path.join(path, x) for x in os.listdir(path) if x not in ignore_files]
+
+def get_current_version():
+    php_path = os.path.join(config.get('bin-dir'), 'php')
+    if not os.path.islink(php_path):
+        return None
+    real_path = os.path.join(os.path.dirname(php_path), os.readlink(php_path))
+    return get_version_from_path(os.path.dirname(real_path))
 
 paths = get_homebrew_paths()
 
 if len(sys.argv) == 1:
+    current_version = get_current_version()
     for version in sorted(paths.iterkeys()):
-        print version
+        print '*' if current_version == version else ' ', version
 else:
     # Reverse sort so that '5.5' will match newest-installed version of 5.5.
     version_prefix = sys.argv[1]
