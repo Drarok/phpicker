@@ -4,15 +4,15 @@ A simple tool, written in Python, to allow selecting between different [Homebrew
 
 ## Usage.
 
-### Displaying available versions.
+### Displaying available / current version(s).
 
 ```bash
 $ phpicker
-5.3.28
-5.4.26
-5.5.10
-5.6.0-alpha.2
-5.6.0-alpha.3
+  5.3.28
+* 5.4.26
+  5.5.10
+  5.6.0-alpha.2
+  5.6.0-alpha.3
 ```
 
 ### Selecting a version.
@@ -20,7 +20,7 @@ $ phpicker
 Switching to PHP 5.4.26.
 
 ```bash
-$ eval $(phpicker 5.4.26)
+$ phpicker 5.4.26
 ```
 
 ### Selecting a version using short syntax.
@@ -28,7 +28,7 @@ $ eval $(phpicker 5.4.26)
 This will select the latest version of PHP 5.6 you have installed.
 
 ```bash
-$ eval $(phpicker 5.6)
+$ phpicker 5.6
 ```
 
 [brew]: http://brew.sh
