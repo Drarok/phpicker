@@ -57,17 +57,21 @@ def get_current_version():
 
 paths = get_homebrew_paths()
 
-if len(sys.argv) == 1:
-    current_version = get_current_version()
-    for version in sorted(paths.iterkeys()):
-        print '*' if current_version == version else ' ', version
-else:
+if len(sys.argv) == 2:
     # Reverse sort so that '5.5' will match newest-installed version of 5.5.
+    success = False
     version_prefix = sys.argv[1]
     for version in sorted(paths.iterkeys(), reverse=True):
         if version[0:len(version_prefix)] == version_prefix:
             select_version_path(paths[version])
-            sys.exit(0)
-    sys.exit(1)
+            success = True
+            break
+    if not success:
+        sys.exit(1)
+
+# Output available and current version(s).
+current_version = get_current_version()
+for version in sorted(paths.iterkeys()):
+    print '*' if current_version == version else ' ', version
 
 sys.exit(0)
