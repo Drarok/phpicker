@@ -2,6 +2,12 @@
 
 A simple tool, written in Python, to allow selecting between different [Homebrew][brew] versions of PHP on OS X.
 
+## Requirements.
+
+* Python >= 2.7.
+* OS X
+* [Homebrew][brew]
+
 ## Usage.
 
 ### Displaying available / current version(s).
@@ -39,6 +45,12 @@ $ phpicker 5.6
   5.5.10
   5.6.0-alpha.2
 * 5.6.0-alpha.3
+```
+
+### Selecting a version without showing (useful in .bashrc, .zshrc, etc).
+
+```bash
+$ phpicker -q 5.4
 ```
 
 [brew]: http://brew.sh
