@@ -2,6 +2,7 @@
 
 from glob import glob
 import argparse
+import commands
 import json
 import os
 import re
@@ -64,8 +65,22 @@ def display_versions(paths):
 
 parser = argparse.ArgumentParser(description='Switch between installed Homebrew versions of PHP.')
 parser.add_argument('-q', '--quiet', action='store_true', help='Don\'t output selected version information.')
-parser.add_argument('version', nargs='?', default=None, help='Version (sub)string e.g. \'5.4.26\' or \'5.5\'.')
+parser.add_argument('command', nargs='?', default=None, help='Command to call, i.e. help.')
+parser.add_argument('args', nargs='*', default=None, help='Arguments to pass to the command.')
 args = parser.parse_args()
+
+if args.command:
+    command = args.command.title()
+    if hasattr(commands, command):
+        classFunc = getattr(commands, command)
+        instance = classFunc(args.args)
+        instance.execute()
+    else:
+        print 'Invalid command.'
+else:
+    print 'No Arguments'
+
+sys.exit(0)
 
 paths = get_homebrew_paths()
 
