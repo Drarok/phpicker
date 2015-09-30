@@ -1,6 +1,6 @@
 # PHPicker.
 
-A simple tool, written in Python, to allow selecting between different [Homebrew][brew] versions of PHP on OS X.
+A simple tool, written in Python, to allow selecting between the system-installed, and different [Homebrew][brew] versions of PHP on OS X.
 
 ## Requirements.
 
@@ -19,6 +19,7 @@ $ phpicker
   5.5.10
   5.6.0-alpha.2
   5.6.0-alpha.3
+  system
 ```
 
 ### Selecting a version.
@@ -32,6 +33,7 @@ $ phpicker 5.4.26
   5.5.10
   5.6.0-alpha.2
   5.6.0-alpha.3
+  system
 ```
 
 ### Selecting a version using short syntax.
@@ -45,6 +47,7 @@ $ phpicker 5.6
   5.5.10
   5.6.0-alpha.2
 * 5.6.0-alpha.3
+  system
 ```
 
 ### Selecting a version silently (useful in .bashrc, .zshrc, etc).
