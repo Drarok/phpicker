@@ -74,7 +74,7 @@ def get_current_version():
     php_path = os.path.join(config.get('bin-dir'), 'php')
     if not os.path.islink(php_path):
         return None
-    real_path = os.path.join(os.path.dirname(php_path), os.readlink(php_path))
+    real_path = os.path.realpath(php_path)
     return get_version_from_path(os.path.dirname(real_path))
 
 def display_versions(paths):
