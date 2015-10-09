@@ -8,6 +8,14 @@ A simple tool, written in Python, to allow selecting between the system-installe
 * OS X
 * [Homebrew][brew]
 
+## Installation.
+
+tl;dr: Clone this repo, create `config.json`, and symlink the binary into your path.
+
+    git clone https://github.com/Drarok/phpicker.git ~/phpicker
+    $EDITOR phpicker/config.json # see config.json.sample to guide you
+    ln -s ~/phpicker/phpicker /usr/local/bin/phpicker
+
 ## Usage.
 
 ### Displaying available / current version(s).
