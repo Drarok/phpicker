@@ -4,10 +4,10 @@ from glob import glob
 import argparse
 import json
 import os
-import re
 import sys
 
-config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
+config_root = os.path.dirname(os.path.realpath(__file__))
+config_path = os.path.join(config_root, 'config.json')
 
 if not os.path.isfile(config_path):
     print 'Please create \'%s\'.' % config_path
@@ -22,13 +22,21 @@ if not os.path.isdir(config.get('bin-dir')):
     print 'Your bin-dir does not exist.'
     sys.exit(1)
 
+
+def get_raw_bin_paths():
+    homebrew_paths = glob('/usr/local/Cellar/php[0-9][0-9]/*/bin')
+    homebrew_paths += glob('/usr/local/Cellar/php@[0-9].[0-9]/*/bin')
+    homebrew_paths += glob('/usr/local/Cellar/php/*/bin')
+    return homebrew_paths
+
+
 def get_php_paths():
     """Get installed PHP paths as a dict, keyed on version."""
-    homebrew_paths = glob('/usr/local/Cellar/php[0-9][0-9]/*/bin')
+    homebrew_paths = get_raw_bin_paths()
 
     paths = dict()
     for homebrew_path in homebrew_paths:
-        version = homebrew_path[24:][0:-4]
+        version = homebrew_path.split('/')[5]
         paths[version] = homebrew_path
 
     system_path = config.get('system-path')
@@ -37,17 +45,20 @@ def get_php_paths():
 
     return paths
 
+
 def get_version_from_path(path):
     """Determine the PHP version based on the path."""
-    for version, php_path in get_php_paths().iteritems():
-        if (php_path == path):
-            return version
-    raise KeyError('Path %s is not recognised' % path)
+    raw_paths = get_raw_bin_paths()
+
+    if path in raw_paths:
+        return path.split('/')[5]
 
     system_path = config.get('system-path')
     if (system_path and system_path == path):
         return 'system'
-    return path[24:][0:-4]
+
+    raise Exception('Failed to get a version from ' + path)
+
 
 def select_version_path(path):
     """Update the symlinks to point to the given PHP path."""
@@ -58,16 +69,18 @@ def select_version_path(path):
 
         if (os.path.isfile(link_path)):
             if (not os.path.islink(link_path)):
-                raise FileExistsError('%s exists and is not a link' % link_path)
+                raise Exception('%s exists and is not a link' % link_path)
             os.unlink(link_path)
 
         file_path = os.path.join(path, file_name)
         os.symlink(file_path, link_path)
 
+
 def get_files_for_path(path):
     """Get the files we should symlink from a given path."""
     ignore_files = ['phar.phar']
     return [os.path.join(path, x) for x in os.listdir(path) if x not in ignore_files]
+
 
 def get_current_version():
     """Get the currently-selected version."""
@@ -77,15 +90,20 @@ def get_current_version():
     real_path = os.path.realpath(php_path)
     return get_version_from_path(os.path.dirname(real_path))
 
+
 def display_versions(paths):
     """Output available and current version(s)."""
     current_version = get_current_version()
     for version in sorted(paths.iterkeys()):
         print '*' if current_version == version else ' ', version
 
+
 parser = argparse.ArgumentParser(description='Switch between installed versions of PHP.')
 parser.add_argument('-q', '--quiet', action='store_true', help='Don\'t output selected version information.')
-parser.add_argument('version', nargs='?', default=None, help='Version (sub)string e.g. \'5.4.26\', \'5.5\', or \'system\'.')
+parser.add_argument(
+    'version', nargs='?', default=None,
+    help='Version (sub)string e.g. \'5.4.26\', \'5.5\', or \'system\'.'
+)
 args = parser.parse_args()
 
 paths = get_php_paths()
